@@ -1,4 +1,4 @@
-(defproject lilac "0.1.0-SNAPSHOT"
+(defproject com.github.vssekorin/lilac "0.1.0-SNAPSHOT"
   :description "A Lambda Calculus implementation in Clojure"
   :url "https://github.com/vssekorin/lilac"
   :license {:name "The MIT License"
