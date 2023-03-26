@@ -44,13 +44,13 @@
     (walk/postwalk #(do (if (pred %) (swap! count inc)) %) coll)
     (> @count 0)))
 
+(defn ^:private λ-concat [vars body] (concat (cons 'λ vars) (cons '. body)))
+
 (defn ^:private β-reduction-substitution [v a body]
   (map #(cond
           (not (coll? %)) (if (= % v) a %)
           (= 'λ (first %)) (let [[vs [_ & bd]] (split-with (partial not= '.) (next %))]
-                             (if (some (partial = v) vs)
-                               bd
-                               (concat (cons 'λ vs) (cons '. (β-reduction-substitution v a bd)))))
+                             (if (some #{v} vs) bd (λ-concat vs (β-reduction-substitution v a bd))))
           :else (β-reduction-substitution v a %))
        body))
 
@@ -60,7 +60,7 @@
     (loop [vars* vars args* args body* body]
       (cond
         (empty? vars*) (if (= 1 (count body*)) (first body*) body*)
-        (empty? args*) (concat (cons 'λ vars*) (cons '. body*))
+        (empty? args*) (λ-concat vars* body*)
         :else (recur (next vars*) (next args*) (β-reduction-substitution (first vars*) (first args*) body*))))))
 
 (defmacro β-reduction [x]
